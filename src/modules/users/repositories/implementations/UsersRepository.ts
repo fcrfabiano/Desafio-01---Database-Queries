@@ -1,6 +1,7 @@
 import { getRepository, Repository } from 'typeorm';
+import { AppError } from '../../../../errors';
 
-import { IFindUserWithGamesDTO, IFindUserByFullNameDTO } from '../../dtos';
+import { IFindUserWithGamesDTO, IFindUserByFullNameDTO, ICreateUserDTO } from '../../dtos';
 import { User } from '../../entities/User';
 import { IUsersRepository } from '../IUsersRepository';
 
@@ -30,7 +31,32 @@ export class UsersRepository implements IUsersRepository {
   async findUserByFullName({
     first_name,
     last_name,
-  }: IFindUserByFullNameDTO): Promise<User[] | undefined> {
-    return await this.repository.query(`SELECT * FROM users WHERE first_name="${first_name}" AND last_name="${last_name}"`); // Complete usando raw query
+  }: IFindUserByFullNameDTO): Promise<User | undefined> {
+    return await this.repository.findOne({
+      first_name,
+      last_name
+    });
   }
+
+  async create({
+    first_name,
+    last_name,
+    email}
+    : ICreateUserDTO): Promise<User> {
+      const user = await this.repository.create({
+        first_name,
+        last_name,
+        email
+      });
+
+      const userEmailAlreadyExists = await this.repository.findOne({email});
+
+      if (userEmailAlreadyExists) {
+        throw new AppError("User Already exists!");
+      }
+
+      await this.repository.save(user);
+
+      return user;
+    };
 }

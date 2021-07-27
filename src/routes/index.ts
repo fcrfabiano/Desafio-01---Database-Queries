@@ -1,11 +1,9 @@
 import { Router } from "express";
 
-import { FindAllUsersController } from "../modules/users/useCases/findAllUsers/FindAllUsersController";
+import { userRoutes } from "./users.routes";
 
 const routes = Router();
 
-const findAllUsersController = new FindAllUsersController();
-
-routes.use("/users", findAllUsersController.handle);
+routes.use("/users", userRoutes);
 
 export { routes }

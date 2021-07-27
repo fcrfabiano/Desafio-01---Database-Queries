@@ -8,9 +8,9 @@ class FindAllUsersController {
 
         const findAllUsersUseCase = container.resolve(FindAllUsersUseCase);
 
-        await findAllUsersUseCase.execute();
+        const usersList = await findAllUsersUseCase.execute();
 
-        return response.status(201).send();
+        return response.status(201).json(usersList);
     }
 }
 
