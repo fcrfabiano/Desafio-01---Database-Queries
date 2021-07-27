@@ -1,11 +1,11 @@
 import { Router } from "express";
 
+import { FindAllUsersController } from "../modules/users/useCases/findAllUsers/FindAllUsersController";
+
 const routes = Router();
 
-routes.use("/users", (request, response) => {
-    return response.json({
-        message: "Hello world!"
-    });
-});
+const findAllUsersController = new FindAllUsersController();
+
+routes.use("/users", findAllUsersController.handle);
 
 export { routes }
