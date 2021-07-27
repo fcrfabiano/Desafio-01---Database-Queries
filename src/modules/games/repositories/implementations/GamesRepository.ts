@@ -1,4 +1,5 @@
 import { getRepository, Repository } from 'typeorm';
+import { AppError } from '../../../../errors';
 
 import { User } from '../../../users/entities/User';
 import { Game } from '../../entities/Game';
@@ -12,19 +13,49 @@ export class GamesRepository implements IGamesRepository {
     this.repository = getRepository(Game);
   }
 
-  async findByTitleContaining(param: string): Promise<Game[]> {
-    return this.repository
-      .createQueryBuilder()
+  async findByTitleContaining(param: string): Promise<void> {
+    const user = await this.repository.find({
+      where: {
+        usersId: param
+      },
+      relations: ["user"]
+    });
       // Complete usando query builder
   }
 
   async countAllGames(): Promise<[{ count: string }]> {
-    return this.repository.query(); // Complete usando raw query
+    return this.repository.query(" SELECT COUNT(id) FROM games"); // Complete usando raw query
   }
 
-  async findUsersByGameId(id: string): Promise<User[]> {
-    return this.repository
-      .createQueryBuilder()
-      // Complete usando query builder
+  async findUsersByGameId(id: string): Promise<User[] | Game[]> {
+    const users = await this.repository
+    .createQueryBuilder("game")
+    .leftJoinAndSelect("game.users", "user")
+    .where('user.id = :id', { id })
+    .getMany();
+    
+    return users;
+  }
+
+  async create(title: string): Promise<Game> {
+    const game = this.repository.create({
+      title
+    });
+
+    const gameExists = await this.repository.findOne({
+      title
+    });
+
+    if(!title) {
+      throw new AppError("Title cannot be empty!");
+    }
+
+    if(gameExists) {
+      throw new AppError("Game already exists!");
+    }
+
+    await this.repository.save(game);
+
+    return game;
   }
 }
