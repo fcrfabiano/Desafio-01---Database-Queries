@@ -46,12 +46,15 @@ export class UsersRepository implements IUsersRepository {
       last_name
     }); */
 
-    const user =  await this.repository
+    /* const user =  await this.repository
       .createQueryBuilder()
       .where("LOWER(first_name) = LOWER(:first_name) AND LOWER(last_name) = LOWER(:last_name)", { first_name, last_name })
-      .getOne();
+      .getOne(); */
 
-    return user;
+      const first = first_name.toLowerCase();
+      const last = last_name.toLowerCase();
+
+    return await this.repository.query(`SELECT * FROM users WHERE LOWER(first_name) = '${first}' AND LOWER(last_name) = '${last}'`);
   }
 
   async create({
