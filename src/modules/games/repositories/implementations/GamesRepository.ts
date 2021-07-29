@@ -28,13 +28,24 @@ export class GamesRepository implements IGamesRepository {
   }
 
   async findUsersByGameId(id: string): Promise<User[] | Game[]> {
-    const users = await this.repository
+    const games = await this.repository
     .createQueryBuilder("game")
     .leftJoinAndSelect("game.users", "user")
     .where('user.id = :id', { id })
     .getMany();
-    
-    return users;
+
+    /* const games: Game[] = await this.repository.find({
+      where: {
+        id: id
+      },
+      relations: ["users"]
+
+      const [{ users }] = games;
+    }); */
+
+    console.log(games);
+
+    return games;
   }
 
   async create(title: string): Promise<Game> {
@@ -57,5 +68,9 @@ export class GamesRepository implements IGamesRepository {
     await this.repository.save(game);
 
     return game;
+  }
+
+  async listAllGames(): Promise<Game[]> {
+    return await this.repository.find();
   }
 }
