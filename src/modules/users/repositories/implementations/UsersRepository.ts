@@ -1,4 +1,4 @@
-import { getRepository, Repository } from 'typeorm';
+import { getConnection, getRepository, Repository } from 'typeorm';
 import { AppError } from '../../../../errors';
 
 import { IFindUserWithGamesDTO, IFindUserByFullNameDTO, ICreateUserDTO } from '../../dtos';
@@ -15,7 +15,12 @@ export class UsersRepository implements IUsersRepository {
   async findUserWithGamesById({
     user_id,
   }: IFindUserWithGamesDTO): Promise<User> {
-    const user = await this.repository.findOne(user_id);
+
+    const user = await this.repository
+    .createQueryBuilder("user")
+    .leftJoinAndSelect("user.games", "game")
+    .where("user.id = :id", { id: user_id })
+    .getOne();
 
     if(!user) {
       throw new Error("User does not exists!");
@@ -25,7 +30,11 @@ export class UsersRepository implements IUsersRepository {
   }
 
   async findAllUsersOrderedByFirstName(): Promise<User[]> {
-    return await this.repository.query("SELECT * FROM users ORDER BY first_name"); // Complete usando raw query
+    const users = await this.repository.query("select * from users student order by first_name");
+
+    console.log(users);
+
+    return users;
   }
 
   async findUserByFullName({
