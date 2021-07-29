@@ -41,10 +41,17 @@ export class UsersRepository implements IUsersRepository {
     first_name,
     last_name,
   }: IFindUserByFullNameDTO): Promise<User | undefined> {
-    return await this.repository.findOne({
+    /* return await this.repository.findOne({
       first_name,
       last_name
-    });
+    }); */
+
+    const user =  await this.repository
+      .createQueryBuilder()
+      .where("LOWER(first_name) = LOWER(:first_name) AND LOWER(last_name) = LOWER(:last_name)", { first_name, last_name })
+      .getOne();
+
+    return user;
   }
 
   async create({
