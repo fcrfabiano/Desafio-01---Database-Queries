@@ -4,7 +4,7 @@ import { Game } from '../entities/Game';
 export interface IGamesRepository {
   findByTitleContaining(title: string): Promise<void>;
   countAllGames(): Promise<[{ count: string }]>;
-  findUsersByGameId(id: string): Promise<User[] | Game[]>;
+  findUsersByGameId(id: string): Promise<User[] | undefined>;
   create(title: string): Promise<Game>;
   listAllGames(): Promise<Game[]>;
 }

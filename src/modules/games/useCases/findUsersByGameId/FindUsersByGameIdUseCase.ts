@@ -10,7 +10,7 @@ class FindUsersByGameIdUseCase {
         private gamesRepository: IGamesRepository
     ) {}
 
-    async execute(id: string): Promise<User[] | Game[]> {
+    async execute(id: string): Promise<User[] | undefined> {
         return await this.gamesRepository.findUsersByGameId(id);
     }
 }
